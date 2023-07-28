@@ -93,11 +93,15 @@
     pulse.enable = true;
   };
 
+  # Enable the fish shell
+  programs.fish.enable = true;
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.tll = {
     isNormalUser = true;
     description = "Brooks J Rady";
     extraGroups = [ "networkmanager" "wheel" ];
+    shell = pkgs.fish;
     packages = with pkgs; [
       firefox
       mailspring
@@ -116,6 +120,7 @@
   home-manager.users.tll = { pkgs, ... }: {
     home.stateVersion = "23.05";
     programs.fish.enable = true;
+    programs.starship.enable = true;
     programs.git = {
       enable = true;
       userName = "Brooks J Rady";
