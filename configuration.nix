@@ -8,7 +8,7 @@
   imports =
     [ # Include the results of the hardware scan
       ./hardware-configuration.nix
-      # Include Home Manager
+      # Include Home Manager (need to move to a flake!)
       <home-manager/nixos>
     ];
 
@@ -115,6 +115,7 @@
   # Can this be merged with the above?
   home-manager.users.tll = { pkgs, ... }: {
     home.stateVersion = "23.05";
+    programs.fish.enable = true;
     programs.git = {
       enable = true;
       userName = "Brooks J Rady";
