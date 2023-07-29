@@ -103,16 +103,45 @@
     extraGroups = [ "networkmanager" "wheel" ];
     shell = pkgs.fish;
     packages = with pkgs; [
-      firefox
-      mailspring
-      emacs
-      spotify
-      logseq
-      gimp
-      bitwarden
       # cq-editor
+      audacity
+      bitwarden
+      blender
+      calibre
+      darktable
       discord
+      emacs
+      firefox
+      fragments
       furtherance
+      gimp
+      google-chrome
+      handbrake
+      helvum
+      hunspell
+      hunspellDicts.en_GB-large
+      hunspellDicts.en_US-large
+      inkscape
+      kicad
+      krita
+      libreoffice
+      logseq
+      mailspring
+      mozillavpn
+      obs-studio
+      prusa-slicer
+      rnote
+      rstudio
+      slack
+      snapper # This feels like it would have some NixOS config!
+      spotify
+      syncthing # Definitely has NixOS config!
+      thonny
+      tor-browser-bundle-bin
+      vlc
+      vscode
+      wireshark
+      zotero
     ];
   };
 
@@ -131,17 +160,36 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    helix
-    zellij
-    fd
-    ripgrep
+    ast-grep
     bat
+    erdtree
+    exa
+    fd
+    helix
+    htop
+    hyperfine
+    inxi
+    lrzip
+    mosh
+    mozwire
+    nmap
+    ripgrep
+    rmlint
+    speedtest-cli
+    tealdeer
+    tokei
+    watchexec
+    wireguard-tools
+    zellij
   ];
 
   # Whitelist a number of nonfree applications
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
     "spotify"
     "discord"
+    "google-chrome"
+    "slack"
+    "vscode"
   ];
 
   # List services that you want to enable:
