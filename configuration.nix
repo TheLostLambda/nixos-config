@@ -162,6 +162,7 @@
   environment.systemPackages = with pkgs; [
     ast-grep
     bat
+    bottom
     erdtree
     exa
     fd
