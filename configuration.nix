@@ -127,7 +127,7 @@
       libreoffice
       logseq
       mailspring
-      mozillavpn
+      mozillavpn # Not working?
       obs-studio
       prusa-slicer
       rnote
@@ -148,12 +148,32 @@
   # Can this be merged with the above?
   home-manager.users.tll = { pkgs, ... }: {
     home.stateVersion = "23.05";
+
     programs.fish.enable = true;
     programs.starship.enable = true;
+
     programs.git = {
       enable = true;
       userName = "Brooks J Rady";
       userEmail = "b.j.rady@gmail.com";
+    };
+
+    dconf.settings = {
+      "org/gnome/mutter" = {
+        dynamic-workspaces = true;
+        edge-tiling = true;
+        workspaces-only-on-primary = true;
+      };
+
+      "org/gnome/settings-daemon/plugins/media-keys" = {
+        custom-keybindings = [ "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/" ];
+      };
+
+      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
+        binding = "<Super>t";
+        command = "kgx";
+        name = "Launch Console";
+      };
     };
   };
 
@@ -170,6 +190,7 @@
     htop
     hyperfine
     inxi
+    killall
     lrzip
     mosh
     mozwire
