@@ -2,6 +2,8 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
+# FIXME: Make all of this configuration into a Flake!
+
 { config, pkgs, lib, ... }:
 
 {
@@ -14,6 +16,31 @@
 
   # Enable Nix flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # Filesystem details for synchrotron
+  # FIXME: Could use some Nix language refactoring!
+  fileSystems."/" =
+    { device = "/dev/disk/by-uuid/27289c95-44b5-4edb-9b1a-2518d997607c";
+      fsType = "btrfs";
+      options = [ "subvol=@" "compress=zstd" ];
+    };
+
+  fileSystems."/home" =
+    { device = "/dev/disk/by-uuid/27289c95-44b5-4edb-9b1a-2518d997607c";
+      fsType = "btrfs";
+      options = [ "subvol=@home" "compress=zstd" ];
+    };
+
+  fileSystems."/nix" =
+    { device = "/dev/disk/by-uuid/27289c95-44b5-4edb-9b1a-2518d997607c";
+      fsType = "btrfs";
+      options = [ "subvol=@nix" "compress=zstd" "noatime" ];
+    };
+
+  fileSystems."/boot" =
+    { device = "/dev/disk/by-uuid/3D10-6079";
+      fsType = "vfat";
+    };
 
   # Bootloader
   boot.loader.systemd-boot.enable = true;
@@ -135,7 +162,6 @@
       slack
       snapper # This feels like it would have some NixOS config!
       spotify
-      syncthing # Definitely has NixOS config!
       thonny
       tor-browser-bundle-bin
       vlc
@@ -149,13 +175,43 @@
   home-manager.users.tll = { pkgs, ... }: {
     home.stateVersion = "23.05";
 
-    programs.fish.enable = true;
-    programs.starship.enable = true;
+    # Create a couple of files for Syncthing
+    home.file.".stignore".text = ''
+      #include /.stignore.txt
+    '';
 
-    programs.git = {
-      enable = true;
-      userName = "Brooks J Rady";
-      userEmail = "b.j.rady@gmail.com";
+    home.file.".stignore.txt".text = ''
+      !/.stignore.txt
+      !/Documents
+      !/Music
+      !/Pictures
+      !/Videos
+      /*
+    '';
+
+    programs = {
+      direnv.enable = true;
+      # nix-direnv.enable = true; Is this something that's still needed?
+      fish.enable = true;
+      starship.enable = true;
+
+      git = {
+        enable = true;
+        userName = "Brooks J Rady";
+        userEmail = "b.j.rady@gmail.com";
+      };
+
+      helix = {
+        enable = true;
+        defaultEditor = true;
+        settings = {
+          theme = "gruvbox";
+          editor = {
+            line-number = "relative";
+            lsp.display-inlay-hints = true;
+          };
+        };
+      };
     };
 
     dconf.settings = {
@@ -219,6 +275,30 @@
   # Enable the OpenSSH daemon
   services.openssh.enable = true;
 
+  # Enable and configure Syncthing
+  services.syncthing = {
+    enable = true;
+    user = "tll";
+    dataDir = "/home/tll";
+    configDir = "/home/tll/.config/syncthing";
+    overrideDevices = true;
+    overrideFolders = true;
+    settings = {
+      devices = {
+        "CUBE" = { id = "6KBEA6K-HANHU7H-EYOAZGE-5BQ3LFB-WSKRIH7-FPLOZY3-DYAINAM-AGWEEAE"; };
+        "Nord II" = { id = "VOSWV6Y-FQHZNEH-WIMSUQQ-URKKD2M-3BSWMS2-4OKEYVU-EHQEN5W-AC7RLQA"; };
+        "Tokamak" = { id = "JLMFDTX-B4ZREF3-YRHQYCL-Z5IC5PK-27K3C4S-3PUQ3TQ-AV7GMB7-P4EWWAY"; };
+        "VCS" = { id = "RYUZGVO-HXLGJNY-GGSLFHH-MGIIYG7-TMHMPEQ-6QFKH7B-GZU7XFB-22SKQAT"; };
+      };
+      folders = {
+        "Documents" = {
+          path = "/home/tll";
+          devices = [ "CUBE" "Nord II" "Tokamak" "VCS" ];
+        };
+      };
+    };
+  };
+  
   # Enable automatic package upgrades
   system.autoUpgrade.enable = true;
 
