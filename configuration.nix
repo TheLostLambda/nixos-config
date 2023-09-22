@@ -43,7 +43,12 @@
     };
 
   # Bootloader
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.grub = {
+    efiSupport = true;
+    device = "nodev";
+    default = "saved";
+    useOSProber = true;
+  };
   boot.loader.efi.canTouchEfiVariables = true;
 
   # Use the latest Linux kernel
@@ -84,7 +89,6 @@
   # Clean up the default GNOME install a bit...
   environment.gnome.excludePackages = with pkgs.gnome; [
     cheese      # photo booth
-    eog         # image viewer
     gedit       # text editor
     simple-scan # document scanner
     totem       # video player
@@ -93,7 +97,7 @@
     seahorse    # password manager
 
     # these should be self explanatory
-    gnome-contacts gnome-font-viewer gnome-logs gnome-maps gnome-music
+    gnome-contacts gnome-logs gnome-maps gnome-music
     pkgs.gnome-photos gnome-screenshot pkgs.gnome-connections pkgs.gnome-tour
   ];
 
@@ -105,6 +109,9 @@
 
   # Absolutely do not ask for any passwords graphically...
   programs.ssh.askPassword = "";
+
+  # Enable gpg to actually decrypt things
+  programs.gnupg.agent.enable = true;
 
   # Enable CUPS to print documents
   services.printing.enable = true;
@@ -159,6 +166,7 @@
       prusa-slicer
       rnote
       rstudio
+      scribus
       slack
       snapper # This feels like it would have some NixOS config!
       spotify
@@ -203,7 +211,7 @@
 
       helix = {
         enable = true;
-        defaultEditor = true;
+        # defaultEditor = true;
         settings = {
           theme = "gruvbox";
           editor = {
@@ -215,10 +223,29 @@
     };
 
     dconf.settings = {
+      "org/gnome/shell" = {
+        favorite-apps = [
+          "firefox.desktop"
+          "spotify.desktop"
+          "logseq.desktop"
+          "emacs.desktop"
+          "org.gnome.Nautilus.desktop"
+          "org.gnome.Console.desktop"
+        ];
+      };
+      
+      "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
+      };
+      
       "org/gnome/mutter" = {
         dynamic-workspaces = true;
         edge-tiling = true;
         workspaces-only-on-primary = true;
+      };
+
+      "org/gnome/desktop/input-sources" = {
+        xkb-options = [ "compose:ralt" ];
       };
 
       "org/gnome/settings-daemon/plugins/media-keys" = {
@@ -239,9 +266,11 @@
     ast-grep
     bat
     bottom
+    delta
     erdtree
-    exa
+    eza
     fd
+    gnupg
     helix
     htop
     hyperfine
@@ -294,6 +323,7 @@
         "Documents" = {
           path = "/home/tll";
           devices = [ "CUBE" "Nord II" "Tokamak" "VCS" ];
+          ignorePerms = false;
         };
       };
     };
